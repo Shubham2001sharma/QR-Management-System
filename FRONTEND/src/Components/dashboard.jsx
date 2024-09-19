@@ -318,7 +318,7 @@ function Dashboard() {
                   setFormData(updatedData);
                   axios
                     .put(
-                      `http://localhost:4000/formdata/status/${result?.text}`,
+                      `https://qr-management-system-api.vercel.app/formdata/status/${result?.text}`,
                       {
                         status: "Delivered",
                         dispatchDate: new Date().toLocaleDateString(),
