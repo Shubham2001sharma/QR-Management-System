@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import QRCode from "react-qr-code";
 import QRCodeGenerator from "qrcode"; // Import the qrcode library
-import { QrReader } from "react-qr-scanner"; // Import the QR reader for webcam scanning
+import ReactQrScanner from "react-qr-scanner";
 import axios from "axios"; // Import axios
 import jsQR from "jsqr"; // Import jsQR for decoding QR codes from images
 
@@ -21,9 +21,11 @@ function Dashboard() {
 
   const today = new Date().toISOString().split("T")[0];
   axios.defaults.withCredentials = true;
+
+  // Fetch data from the backend on component load
   useEffect(() => {
     axios
-      .get("qr-management-system-api.vercel.app/formdata") // Replace with your API endpoint
+      .get("https://qr-management-system-api.vercel.app/formdata") // Replace with your API endpoint
       .then((response) => {
         setFormData(response.data);
       })
@@ -32,19 +34,25 @@ function Dashboard() {
       });
   }, []);
 
+  // Logout handler
   const handleLogout = () => {
     localStorage.removeItem("token");
     navigate("/");
   };
 
+  // Open the QR code generator popup
   const openPopup = () => {
     setShowPopup(true);
   };
 
   const closePopup = () => {
     setShowPopup(false);
+    setComponent("");
+    setDate("");
+    setItems("");
   };
 
+  // Handle form submission (add or update entry)
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -53,27 +61,21 @@ function Dashboard() {
       date,
       items: Number(items),
       status: "Pending",
-      qrCodeValue: component,
+      qrCodeValue: component, // QR Code value is set to component name
       dispatchDate: null,
     };
 
     if (editingIndex !== null) {
       // Update existing entry
-      const entryId = formData[editingIndex]._id; // Ensure the correct ID is used
+      const entryId = formData[editingIndex]._id;
       axios
-        .put(
-          `qr-management-system-api.vercel.app/formdata/${entryId}`,
-          newEntry
-        ) // Update endpoint
+        .put(`https://qr-management-system-api.vercel.app/formdata/${entryId}`, newEntry)
         .then((response) => {
           const updatedData = [...formData];
-          updatedData[editingIndex] = response.data; // Use the response data to update the state
+          updatedData[editingIndex] = response.data;
           setFormData(updatedData);
           setEditingIndex(null);
-          setComponent("");
-          setDate("");
-          setItems("");
-          setShowPopup(false);
+          closePopup();
         })
         .catch((error) => {
           console.error("Error updating data:", error);
@@ -81,13 +83,10 @@ function Dashboard() {
     } else {
       // Add new entry
       axios
-        .post("qr-management-system-api.vercel.app/formdata", newEntry) // Create endpoint
+        .post("https://qr-management-system-api.vercel.app/formdata", newEntry)
         .then((response) => {
           setFormData([...formData, response.data]);
-          setComponent("");
-          setDate("");
-          setItems("");
-          setShowPopup(false);
+          closePopup();
         })
         .catch((error) => {
           console.error("Error adding data:", error);
@@ -95,6 +94,7 @@ function Dashboard() {
     }
   };
 
+  // Download the QR code as a PNG
   const downloadQRCode = (value) => {
     QRCodeGenerator.toDataURL(value, { width: 100 }, (err, url) => {
       if (err) {
@@ -108,6 +108,7 @@ function Dashboard() {
     });
   };
 
+  // Handle entry update
   const handleUpdate = (index) => {
     const entryToEdit = formData[index];
     setComponent(entryToEdit.component);
@@ -117,6 +118,7 @@ function Dashboard() {
     openPopup();
   };
 
+  // Handle entry deletion
   const handleDelete = (index) => {
     const entryToDelete = formData[index];
 
@@ -126,22 +128,17 @@ function Dashboard() {
     }
 
     axios
-      .delete(
-        `qr-management-system-api.vercel.app/formdata/${entryToDelete._id}`
-      ) // Ensure correct endpoint
+      .delete(`https://qr-management-system-api.vercel.app/formdata/${entryToDelete._id}`)
       .then(() => {
-        // Remove the entry from the state only after successful deletion from the backend
         const updatedData = formData.filter((_, i) => i !== index);
         setFormData(updatedData);
       })
       .catch((error) => {
-        console.error(
-          "Error deleting data:",
-          error.response ? error.response.data : error.message
-        );
+        console.error("Error deleting data:", error.response ? error.response.data : error.message);
       });
   };
 
+  // Handle image upload and QR code detection
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -157,34 +154,23 @@ function Dashboard() {
         canvas.height = image.height;
         context.drawImage(image, 0, 0, canvas.width, canvas.height);
 
-        const imageData = context.getImageData(
-          0,
-          0,
-          canvas.width,
-          canvas.height
-        );
+        const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
         const qrCode = jsQR(imageData.data, canvas.width, canvas.height);
 
         if (qrCode) {
-          setScannedData(qrCode.data); // Store the scanned data
+          setScannedData(qrCode.data);
           const updatedData = formData.map((entry) =>
             entry.qrCodeValue === qrCode.data
-              ? {
-                  ...entry,
-                  status: "Delivered",
-                  dispatchDate: new Date().toLocaleDateString(),
-                }
+              ? { ...entry, status: "Delivered", dispatchDate: new Date().toLocaleDateString() }
               : entry
           );
           setFormData(updatedData);
+
           axios
-            .put(
-              `qr-management-system-api.vercel.app/formdata/status/${qrCode.data}`,
-              {
-                status: "Delivered",
-                dispatchDate: new Date().toLocaleDateString(),
-              }
-            )
+            .put(`https://qr-management-system-api.vercel.app/formdata/status/${qrCode.data}`, {
+              status: "Delivered",
+              dispatchDate: new Date().toLocaleDateString(),
+            })
             .catch((error) => {
               console.error("Error updating status:", error);
             });
@@ -195,7 +181,7 @@ function Dashboard() {
     };
     reader.readAsDataURL(file);
   };
-
+  
   return (
     <>
       <div className="flex justify-between p-4 bg-gray-100">
@@ -314,7 +300,7 @@ function Dashboard() {
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded shadow-md w-96 relative">
             <h2 className="text-xl font-bold mb-4">Scan QR Code</h2>
-            <QrReader
+            <ReactQrScanner
               delay={300} // Reduce delay for faster scanning
               facingMode="environment" // Use the rear camera by default for mobile devices
               onResult={(result, error) => {

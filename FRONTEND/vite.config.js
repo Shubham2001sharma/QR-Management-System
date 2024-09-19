@@ -7,6 +7,9 @@ export default defineConfig({
   resolve: {
     alias: {
       'qrcode.react': 'qrcode.react'
-    }
+    },
+    optimizeDeps: {
+      exclude: ['@babel/runtime'],
+    },
   }
 })
