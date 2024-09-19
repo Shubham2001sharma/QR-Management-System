@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 // MongoDB connection
-const mongoURL = 'mongodb://localhost:27017/QR-inventory'; // You can update the database name as needed
+const mongoURL = 'mongodb+srv://sharmashubu4600:18jan2001@qr-management-system.mny3n.mongodb.net/?retryWrites=true&w=majority&appName=QR-Management-System'; // You can update the database name as needed
 mongoose.connect(mongoURL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
