@@ -22,10 +22,10 @@ function Dashboard() {
   const navigate = useNavigate();
 
   const today = new Date().toISOString().split("T")[0];
-
+axios.defaults.withCredentials=true;
   useEffect(() => {
     axios
-      .get("http://localhost:4000/formdata") // Replace with your API endpoint
+      .get("qr-management-system-api.vercel.app/formdata") // Replace with your API endpoint
       .then((response) => {
         setFormData(response.data);
       })
@@ -63,7 +63,7 @@ function Dashboard() {
       // Update existing entry
       const entryId = formData[editingIndex]._id; // Ensure the correct ID is used
       axios
-        .put(`http://localhost:4000/formdata/${entryId}`, newEntry) // Update endpoint
+        .put(`qr-management-system-api.vercel.app/formdata/${entryId}`, newEntry) // Update endpoint
         .then((response) => {
           const updatedData = [...formData];
           updatedData[editingIndex] = response.data; // Use the response data to update the state
@@ -80,7 +80,7 @@ function Dashboard() {
     } else {
       // Add new entry
       axios
-        .post("http://localhost:4000/formdata", newEntry) // Create endpoint
+        .post("qr-management-system-api.vercel.app/formdata", newEntry) // Create endpoint
         .then((response) => {
           setFormData([...formData, response.data]);
           setComponent("");
@@ -125,7 +125,7 @@ function Dashboard() {
     }
 
     axios
-      .delete(`http://localhost:4000/formdata/${entryToDelete._id}`) // Ensure correct endpoint
+      .delete(`qr-management-system-api.vercel.app/formdata/${entryToDelete._id}`) // Ensure correct endpoint
       .then(() => {
         // Remove the entry from the state only after successful deletion from the backend
         const updatedData = formData.filter((_, i) => i !== index);
@@ -170,7 +170,7 @@ function Dashboard() {
           );
           setFormData(updatedData);
           axios
-            .put(`http://localhost:4000/formdata/status/${qrCode.data}`, {
+            .put(`qr-management-system-api.vercel.app/formdata/status/${qrCode.data}`, {
               status: "Delivered",
               dispatchDate: new Date().toLocaleDateString(),
             })
