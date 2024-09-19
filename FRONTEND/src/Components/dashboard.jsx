@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import QRCode from "react-qr-code";
 import QRCodeGenerator from "qrcode"; // Import the qrcode library
-import { QrReader } from "react-qr-reader"; // Import the QR reader for webcam scanning
+import { QrReader } from "react-qr-scanner"; // Import the QR reader for webcam scanning
 import axios from "axios"; // Import axios
 import jsQR from "jsqr"; // Import jsQR for decoding QR codes from images
 
