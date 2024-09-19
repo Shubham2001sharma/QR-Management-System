@@ -6,7 +6,6 @@ import { QrReader } from "react-qr-reader"; // Import the QR reader for webcam s
 import axios from "axios"; // Import axios
 import jsQR from "jsqr"; // Import jsQR for decoding QR codes from images
 
-
 function Dashboard() {
   const [showPopup, setShowPopup] = useState(false);
   const [showScan, setShowScan] = useState(false); // State to control the Scan QR section
@@ -18,11 +17,10 @@ function Dashboard() {
   const [scannedData, setScannedData] = useState(""); // State to store scanned QR data
   const [uploadedImage, setUploadedImage] = useState(null); // For storing uploaded image
 
-
   const navigate = useNavigate();
 
   const today = new Date().toISOString().split("T")[0];
-axios.defaults.withCredentials=true;
+  axios.defaults.withCredentials = true;
   useEffect(() => {
     axios
       .get("qr-management-system-api.vercel.app/formdata") // Replace with your API endpoint
@@ -63,7 +61,10 @@ axios.defaults.withCredentials=true;
       // Update existing entry
       const entryId = formData[editingIndex]._id; // Ensure the correct ID is used
       axios
-        .put(`qr-management-system-api.vercel.app/formdata/${entryId}`, newEntry) // Update endpoint
+        .put(
+          `qr-management-system-api.vercel.app/formdata/${entryId}`,
+          newEntry
+        ) // Update endpoint
         .then((response) => {
           const updatedData = [...formData];
           updatedData[editingIndex] = response.data; // Use the response data to update the state
@@ -125,7 +126,9 @@ axios.defaults.withCredentials=true;
     }
 
     axios
-      .delete(`qr-management-system-api.vercel.app/formdata/${entryToDelete._id}`) // Ensure correct endpoint
+      .delete(
+        `qr-management-system-api.vercel.app/formdata/${entryToDelete._id}`
+      ) // Ensure correct endpoint
       .then(() => {
         // Remove the entry from the state only after successful deletion from the backend
         const updatedData = formData.filter((_, i) => i !== index);
@@ -154,7 +157,12 @@ axios.defaults.withCredentials=true;
         canvas.height = image.height;
         context.drawImage(image, 0, 0, canvas.width, canvas.height);
 
-        const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+        const imageData = context.getImageData(
+          0,
+          0,
+          canvas.width,
+          canvas.height
+        );
         const qrCode = jsQR(imageData.data, canvas.width, canvas.height);
 
         if (qrCode) {
@@ -170,10 +178,13 @@ axios.defaults.withCredentials=true;
           );
           setFormData(updatedData);
           axios
-            .put(`qr-management-system-api.vercel.app/formdata/status/${qrCode.data}`, {
-              status: "Delivered",
-              dispatchDate: new Date().toLocaleDateString(),
-            })
+            .put(
+              `qr-management-system-api.vercel.app/formdata/status/${qrCode.data}`,
+              {
+                status: "Delivered",
+                dispatchDate: new Date().toLocaleDateString(),
+              }
+            )
             .catch((error) => {
               console.error("Error updating status:", error);
             });
@@ -300,53 +311,52 @@ axios.defaults.withCredentials=true;
 
       {/* Scan QR Code Section */}
       {showScan && (
-  <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-    <div className="bg-white p-6 rounded shadow-md w-96 relative">
-      <h2 className="text-xl font-bold mb-4">Scan QR Code</h2>
-      <QrReader
-        delay={300} // Reduce delay for faster scanning
-        facingMode="environment" // Use the rear camera by default for mobile devices
-        onResult={(result, error) => {
-          if (result) {
-            setScannedData(result?.text);
-            const updatedData = formData.map((entry) =>
-              entry.qrCodeValue === result?.text
-                ? {
-                    ...entry,
-                    status: "Delivered",
-                    dispatchDate: new Date().toLocaleDateString(),
-                  }
-                : entry
-            );
-            setFormData(updatedData);
-            axios
-              .put(
-                `http://localhost:4000/formdata/status/${result?.text}`,
-                {
-                  status: "Delivered",
-                  dispatchDate: new Date().toLocaleDateString(),
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded shadow-md w-96 relative">
+            <h2 className="text-xl font-bold mb-4">Scan QR Code</h2>
+            <QrReader
+              delay={300} // Reduce delay for faster scanning
+              facingMode="environment" // Use the rear camera by default for mobile devices
+              onResult={(result, error) => {
+                if (result) {
+                  setScannedData(result?.text);
+                  const updatedData = formData.map((entry) =>
+                    entry.qrCodeValue === result?.text
+                      ? {
+                          ...entry,
+                          status: "Delivered",
+                          dispatchDate: new Date().toLocaleDateString(),
+                        }
+                      : entry
+                  );
+                  setFormData(updatedData);
+                  axios
+                    .put(
+                      `http://localhost:4000/formdata/status/${result?.text}`,
+                      {
+                        status: "Delivered",
+                        dispatchDate: new Date().toLocaleDateString(),
+                      }
+                    )
+                    .catch((error) => {
+                      console.error("Error updating status:", error);
+                    });
                 }
-              )
-              .catch((error) => {
-                console.error("Error updating status:", error);
-              });
-          }
-          if (error) {
-            console.error("QR Scan Error:", error);
-          }
-        }}
-        style={{ width: "100%" }}
-      />
-      <button
-        onClick={() => setShowScan(false)}
-        className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
-      >
-        X
-      </button>
-    </div>
-  </div>
-)}
-
+                if (error) {
+                  console.error("QR Scan Error:", error);
+                }
+              }}
+              style={{ width: "100%" }}
+            />
+            <button
+              onClick={() => setShowScan(false)}
+              className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
+            >
+              X
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Display Table with Submitted Data */}
       {formData.length > 0 && (
