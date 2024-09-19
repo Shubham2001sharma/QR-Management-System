@@ -12,7 +12,7 @@ function Register() {
     e.preventDefault();
 
     try {
-      const response = await axios.post("http://localhost:4000/registerdata", {
+      const response = await axios.post("https://qr-management-system-api.vercel.app/registerdata", {
         name,
         email,
         password,

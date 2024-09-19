@@ -11,7 +11,7 @@ function Login() {
     e.preventDefault();
 
     try {
-      const response = await axios.post("http://localhost:4000/logindata", {
+      const response = await axios.post("https://qr-management-system-api.vercel.app/logindata", {
         email,
         password,
       });
