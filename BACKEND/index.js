@@ -7,14 +7,7 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 
 // Middleware to allow CORS
-app.use(
-  cors({
-    origin: ["https://qr-management-system-frontend-six.vercel.app',"],
-    methods: ["GET,POST,PUT,DELETE"],
-    credentials: true,
-  })
-);
-
+app.use(cors());
 // Middleware to parse JSON request bodies
 app.use(express.json());
 app.use(bodyParser.json());
