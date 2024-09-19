@@ -16,6 +16,10 @@ app.use(bodyParser.json());
 //secret key
 const JWTSECRETKEY = "shubhamsharma";
 
+app.get("/",(req,res)=>{
+  res.json('hello');
+})
+
 app.post("/registerdata", (req, res) => {
   const { name, email, password } = req.body;
 
