@@ -9,7 +9,8 @@ const mongoose = require("mongoose");
 // Middleware to allow CORS
 app.use(cors(
   {
-    origin:["https://qr-management-system-api.vercel.app"]
+    origin:["https://qr-management-system-api.vercel.app"],
+    credentials:true
   }
 ));
 
