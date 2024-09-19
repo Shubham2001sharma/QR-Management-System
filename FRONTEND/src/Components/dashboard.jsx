@@ -25,7 +25,7 @@ function Dashboard() {
   // Fetch data from the backend on component load
   useEffect(() => {
     axios
-      .get("https://qr-management-system-api.vercel.app/formdata") // Replace with your API endpoint
+      .get("https://qr-management-system-api.vercel.app/formdata")
       .then((response) => {
         setFormData(response.data);
       })
@@ -181,7 +181,7 @@ function Dashboard() {
     };
     reader.readAsDataURL(file);
   };
-  
+
   return (
     <>
       <div className="flex justify-between p-4 bg-gray-100">
