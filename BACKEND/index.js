@@ -7,12 +7,13 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 
 // Middleware to allow CORS
-app.use(cors(
-  {
-    origin:["https://qr-management-system-api.vercel.app"],
-    credentials:true
-  }
-));
+app.use(
+  cors({
+    origin: ["https://qr-management-system-frontend-six.vercel.app',"],
+    methods: "GET,POST,PUT,DELETE",
+    credentials: true,
+  })
+);
 
 // Middleware to parse JSON request bodies
 app.use(express.json());
@@ -21,9 +22,9 @@ app.use(bodyParser.json());
 //secret key
 const JWTSECRETKEY = "shubhamsharma";
 
-app.get("/",(req,res)=>{
-  res.json('hello');
-})
+app.get("/", (req, res) => {
+  res.json("hello");
+});
 
 app.post("/registerdata", (req, res) => {
   const { name, email, password } = req.body;
