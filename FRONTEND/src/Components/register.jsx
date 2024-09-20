@@ -30,22 +30,25 @@ function Register() {
   return (
     <div>
       {/* Navigation Bar */}
-      <div className="flex justify-between p-4 bg-gray-100">
-        <div className="text-blue-900 text-xl font-bold">
+      <div className="flex flex-wrap justify-between items-center p-4 bg-gray-100">
+        <div className="text-blue-900 text-lg sm:text-xl font-bold">
           Inventory Management System
         </div>
-        <div>
-          < button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out mr-4"
-          >QR code generator</button>
-          <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out">Scan QR</button>
+        <div className="flex space-x-2 sm:space-x-4 mt-2 sm:mt-0">
+          <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out">
+            QR code generator
+          </button>
+          <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out">
+            Scan QR
+          </button>
         </div>
-        <div>
+        <div className="flex space-x-2 sm:space-x-4 mt-2 sm:mt-0">
           <Link to="/login">
             <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
               Sign In
             </button>
           </Link>
-          <Link to="/register" className="ml-4">
+          <Link to="/register">
             <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
               Register
             </button>
@@ -54,9 +57,9 @@ function Register() {
       </div>
 
       {/* Form Section */}
-      <div className="flex justify-center items-center min-h-screen bg-gray-50">
+      <div className="flex justify-center items-center min-h-screen bg-gray-50 px-4 sm:px-6 lg:px-8">
         <form
-          className="bg-white p-6 rounded shadow-md w-80"
+          className="bg-white p-6 sm:p-8 rounded shadow-md w-full max-w-md"
           onSubmit={handleRegisterSubmit}
         >
           <h2 className="text-2xl font-bold mb-4">Register</h2>

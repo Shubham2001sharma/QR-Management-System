@@ -1,28 +1,27 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import QRCode from "react-qr-code";
-import QRCodeGenerator from "qrcode"; // Import the qrcode library
+import QRCodeGenerator from "qrcode";
 import ReactQrScanner from "react-qr-scanner";
-import axios from "axios"; // Import axios
-import jsQR from "jsqr"; // Import jsQR for decoding QR codes from images
+import axios from "axios";
+import jsQR from "jsqr";
 
 function Dashboard() {
   const [showPopup, setShowPopup] = useState(false);
-  const [showScan, setShowScan] = useState(false); // State to control the Scan QR section
+  const [showScan, setShowScan] = useState(false);
   const [formData, setFormData] = useState([]);
   const [component, setComponent] = useState("");
   const [date, setDate] = useState("");
   const [items, setItems] = useState("");
-  const [editingIndex, setEditingIndex] = useState(null); // Index for editing
-  const [scannedData, setScannedData] = useState(""); // State to store scanned QR data
-  const [uploadedImage, setUploadedImage] = useState(null); // For storing uploaded image
+  const [editingIndex, setEditingIndex] = useState(null);
+  const [scannedData, setScannedData] = useState("");
+  const [uploadedImage, setUploadedImage] = useState(null);
 
   const navigate = useNavigate();
 
   const today = new Date().toISOString().split("T")[0];
   axios.defaults.withCredentials = true;
 
-  // Fetch data from the backend on component load
   useEffect(() => {
     axios
       .get("https://qr-management-system-api.vercel.app/formdata")
@@ -34,13 +33,11 @@ function Dashboard() {
       });
   }, []);
 
-  // Logout handler
   const handleLogout = () => {
     localStorage.removeItem("token");
     navigate("/");
   };
 
-  // Open the QR code generator popup
   const openPopup = () => {
     setShowPopup(true);
   };
@@ -52,7 +49,6 @@ function Dashboard() {
     setItems("");
   };
 
-  // Handle form submission (add or update entry)
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -61,12 +57,11 @@ function Dashboard() {
       date,
       items: Number(items),
       status: "Pending",
-      qrCodeValue: component, // QR Code value is set to component name
+      qrCodeValue: component,
       dispatchDate: null,
     };
 
     if (editingIndex !== null) {
-      // Update existing entry
       const entryId = formData[editingIndex]._id;
       axios
         .put(`https://qr-management-system-api.vercel.app/formdata/${entryId}`, newEntry)
@@ -81,7 +76,6 @@ function Dashboard() {
           console.error("Error updating data:", error);
         });
     } else {
-      // Add new entry
       axios
         .post("https://qr-management-system-api.vercel.app/formdata", newEntry)
         .then((response) => {
@@ -94,7 +88,6 @@ function Dashboard() {
     }
   };
 
-  // Download the QR code as a PNG
   const downloadQRCode = (value) => {
     QRCodeGenerator.toDataURL(value, { width: 100 }, (err, url) => {
       if (err) {
@@ -108,7 +101,6 @@ function Dashboard() {
     });
   };
 
-  // Handle entry update
   const handleUpdate = (index) => {
     const entryToEdit = formData[index];
     setComponent(entryToEdit.component);
@@ -118,7 +110,6 @@ function Dashboard() {
     openPopup();
   };
 
-  // Handle entry deletion
   const handleDelete = (index) => {
     const entryToDelete = formData[index];
 
@@ -138,7 +129,6 @@ function Dashboard() {
       });
   };
 
-  // Handle image upload and QR code detection
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -184,14 +174,12 @@ function Dashboard() {
 
   return (
     <>
-      <div className="flex justify-between p-4 bg-gray-100">
-        <div className="text-blue-900 text-xl font-bold">
-          Inventory Management System
-        </div>
-        <div className="">
+      <div className="flex justify-between items-center p-4 bg-gray-100">
+        <div className="text-blue-900 text-lg font-bold">Inventory Management System</div>
+        <div className="flex space-x-4">
           <button
             onClick={openPopup}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-4"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
           >
             QR Code Generator
           </button>
@@ -202,38 +190,29 @@ function Dashboard() {
             Scan QR Code
           </button>
         </div>
-        <div>
-          <button
-            onClick={handleLogout}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          >
-            LogOut
-          </button>
-        </div>
+        <button
+          onClick={handleLogout}
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        >
+          LogOut
+        </button>
       </div>
 
-      {/* QR Image Upload Section */}
       <div className="mt-8">
-        <h2 className="text-xl font-bold mb-4">Upload QR Code Image</h2>
+        <h2 className="text-lg font-bold mb-4">Upload QR Code Image</h2>
         <input
           type="file"
           accept="image/*"
           onChange={handleImageUpload}
           className="mb-4"
         />
-        {/* {scannedData && (
-          <p className="text-green-600">Scanned Data: {scannedData}</p>
-        )} */}
       </div>
 
-      {/* Popup Modal */}
       {showPopup && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded shadow-md w-96 relative">
-            <h2 className="text-xl font-bold mb-4">
-              {editingIndex !== null
-                ? "Edit QR Code"
-                : "QR Code Generator Form"}
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50 p-4">
+          <div className="bg-white p-6 rounded shadow-md w-full max-w-md relative">
+            <h2 className="text-lg font-bold mb-4">
+              {editingIndex !== null ? "Edit QR Code" : "QR Code Generator Form"}
             </h2>
             <form onSubmit={handleSubmit}>
               <label className="block mb-2">
@@ -269,125 +248,73 @@ function Dashboard() {
                 )}
               </label>
               <label className="block mb-2">
-                Number of Items:
+                Items Received:
                 <input
                   type="number"
-                  placeholder="Enter number of items"
                   value={items}
                   onChange={(e) => setItems(e.target.value)}
                   className="w-full p-2 border border-gray-300 rounded mb-4"
                 />
               </label>
-              <button
-                type="submit"
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-              >
-                {editingIndex !== null ? "Update QR Code" : "Generate QR Code"}
-              </button>
+              <div className="flex justify-between items-center">
+                <button
+                  type="submit"
+                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                >
+                  {editingIndex !== null ? "Update" : "Submit"}
+                </button>
+                <button
+                  onClick={closePopup}
+                  className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+                >
+                  Close
+                </button>
+              </div>
             </form>
-            <button
-              onClick={closePopup}
-              className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
-            >
-              X
-            </button>
           </div>
         </div>
       )}
 
-      {/* Scan QR Code Section */}
-      {showScan && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded shadow-md w-96 relative">
-            <h2 className="text-xl font-bold mb-4">Scan QR Code</h2>
-            <ReactQrScanner
-              delay={300} // Reduce delay for faster scanning
-              facingMode="environment" // Use the rear camera by default for mobile devices
-              onResult={(result, error) => {
-                if (result) {
-                  setScannedData(result?.text);
-                  const updatedData = formData.map((entry) =>
-                    entry.qrCodeValue === result?.text
-                      ? {
-                          ...entry,
-                          status: "Delivered",
-                          dispatchDate: new Date().toLocaleDateString(),
-                        }
-                      : entry
-                  );
-                  setFormData(updatedData);
-                  axios
-                    .put(
-                      `https://qr-management-system-api.vercel.app/formdata/status/${result?.text}`,
-                      {
-                        status: "Delivered",
-                        dispatchDate: new Date().toLocaleDateString(),
-                      }
-                    )
-                    .catch((error) => {
-                      console.error("Error updating status:", error);
-                    });
-                }
-                if (error) {
-                  console.error("QR Scan Error:", error);
-                }
-              }}
-              style={{ width: "100%" }}
-            />
-            <button
-              onClick={() => setShowScan(false)}
-              className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
-            >
-              X
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Display Table with Submitted Data */}
-      {formData.length > 0 && (
-        <div className="mt-8">
-          <h2 className="text-xl font-bold mb-4">Submitted Data</h2>
-          <table className="min-w-full bg-white border border-gray-300">
+      <div className="mt-8 px-2">
+        <h2 className="text-lg font-bold mb-4">QR Codes Table</h2>
+        <div className="overflow-x-auto">
+          <table className="min-w-full bg-white border">
             <thead>
               <tr>
-                <th className="py-2 px-4 border-b">Component</th>
-                <th className="py-2 px-4 border-b">Date Received</th>
-                <th className="py-2 px-4 border-b">Date Dispatch</th>
-                <th className="py-2 px-4 border-b">Items</th>
-                <th className="py-2 px-4 border-b">Status</th>
-                <th className="py-2 px-4 border-b">QR Code</th>
-                <th className="py-2 px-4 border-b">Admin Panel</th>
+                <th className="px-4 py-2 border">Component</th>
+                <th className="px-4 py-2 border">Date</th>
+                <th className="px-4 py-2 border">Items</th>
+                <th className="px-4 py-2 border">Status</th>
+                <th className="px-4 py-2 border">QR Code</th>
+                <th className="px-4 py-2 border">Actions</th>
               </tr>
             </thead>
             <tbody>
               {formData.map((entry, index) => (
-                <tr key={index}>
-                  <td className="py-2 px-4 border-b">{entry.component}</td>
-                  <td className="py-2 px-4 border-b">{entry.date}</td>
-                  <td className="py-2 px-4 border-b">
-                    {entry.dispatchDate || "-"}
-                  </td>
-                  <td className="py-2 px-4 border-b">{entry.items}</td>
-                  <td className="py-2 px-4 border-b">{entry.status}</td>
-                  <td className="py-2 px-4 border-b">
-                    <div
+                <tr key={index} className="border">
+                  <td className="px-4 py-2 border">{entry.component}</td>
+                  <td className="px-4 py-2 border">{entry.date}</td>
+                  <td className="px-4 py-2 border">{entry.items}</td>
+                  <td className="px-4 py-2 border">{entry.status}</td>
+                  <td className="px-4 py-2 border">
+                    <QRCode value={entry.qrCodeValue} size={50} />
+                    <button
                       onClick={() => downloadQRCode(entry.qrCodeValue)}
-                      style={{ cursor: "pointer" }}
+                      className="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-2 rounded mt-2"
                     >
-                      <QRCode value={entry.qrCodeValue} size={100} />
-                    </div>
+                      Download QR Code
+                    </button>
                   </td>
-                  <td className="py-2 px-4 border-b">
+                  <td className="px-4 py-2 border">
                     <button
                       onClick={() => handleUpdate(index)}
-                      className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded mr-2"
+                      className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-2 rounded"
                     >
                       Update
                     </button>
                     <button
                       onClick={() => handleDelete(index)}
-                      className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                      className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded ml-2"
                     >
                       Delete
                     </button>
@@ -396,6 +323,33 @@ function Dashboard() {
               ))}
             </tbody>
           </table>
+        </div>
+      </div>
+
+      {showScan && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded shadow-md">
+            <h2 className="text-lg font-bold mb-4">Scan QR Code</h2>
+            <ReactQrScanner
+              delay={300}
+              onError={(err) => console.error("Error scanning QR code:", err)}
+              onScan={(data) => {
+                if (data) {
+                  setScannedData(data);
+                  setShowScan(false);
+                }
+              }}
+              className="w-full h-auto"
+            />
+            <div className="mt-4 flex justify-between">
+              <button
+                onClick={() => setShowScan(false)}
+                className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+              >
+                Close
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </>
